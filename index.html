@@ -9,12 +9,14 @@
   <button onclick="resetPassword()" style="padding:10px 20px;font-size:16px;">Set Password</button>
   <p id="status" style="margin-top:12px;color:crimson;"></p>
 
+  <!-- Load supabase.js first -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <!-- Then run your code -->
   <script>
     const SUPABASE_URL = "https://sbdagijwiamcuefrovri.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZGFnaWp3aWFtY3VlZnJvdnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwNzkxNjIsImV4cCI6MjA2MTY1NTE2Mn0.dNm3mcwbHbDXqotTHnDSZQRu1LTKfZD1LEvxtm4qwps";
-    
-    // Rename variable to avoid conflict with imported supabase object
+
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const urlParams = new URLSearchParams(window.location.hash.slice(1));
