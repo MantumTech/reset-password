@@ -13,7 +13,9 @@
   <script>
     const SUPABASE_URL = "https://sbdagijwiamcuefrovri.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZGFnaWp3aWFtY3VlZnJvdnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwNzkxNjIsImV4cCI6MjA2MTY1NTE2Mn0.dNm3mcwbHbDXqotTHnDSZQRu1LTKfZD1LEvxtm4qwps";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Rename variable to avoid conflict with imported supabase object
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const urlParams = new URLSearchParams(window.location.hash.slice(1));
     const access_token = urlParams.get("access_token");
@@ -46,7 +48,7 @@
         return;
       }
 
-      const { error } = await supabase.auth.updateUser({ password }, { accessToken: access_token });
+      const { error } = await supabaseClient.auth.updateUser({ password }, { accessToken: access_token });
 
       if (error) {
         status.textContent = "Error: " + error.message;
