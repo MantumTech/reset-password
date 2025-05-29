@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reset Your Password</title>
+</head>
+<body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
+  <h2>Reset Your Password</h2>
+  <input id="new-password" type="password" placeholder="New Password" style="padding:10px;font-size:16px;width:250px;margin-bottom:12px;">
+  <button onclick="resetPassword()" style="padding:10px 20px;font-size:16px;">Set Password</button>
+  <p id="status" style="margin-top:12px;"></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const SUPABASE_URL = "https://sbdagijwiamcuefrovri.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZGFnaWp3aWFtY3VlZnJvdnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwNzkxNjIsImV4cCI6MjA2MTY1NTE2Mn0.dNm3mcwbHbDXqotTHnDSZQRu1LTKfZD1LEvxtm4qwps";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const urlParams = new URLSearchParams(window.location.hash.slice(1));
+    const access_token = urlParams.get("access_token");
+
+    async function resetPassword() {
+      const password = document.getElementById("new-password").value;
+      const status = document.getElementById("status");
+
+      if (!access_token) {
+        status.textContent = "Missing access token.";
+        return;
+      }
+
+      const { error } = await supabase.auth.updateUser({ password }, { accessToken: access_token });
+
+      if (error) {
+        status.textContent = "Error: " + error.message;
+      } else {
+        status.textContent = "Password updated successfully!";
+      }
+    }
+  </script>
+</body>
+</html>
