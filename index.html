@@ -5,22 +5,28 @@
 </head>
 <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
   <h2>Reset Your Password</h2>
-  <input id="new-password" type="password" placeholder="New Password" style="padding:10px;font-size:16px;width:250px;margin-bottom:12px;">
+
+  <input id="new-password" type="password" placeholder="New Password" style="padding:10px;font-size:16px;width:250px;margin-bottom:8px;">
+  <label style="margin-bottom:12px;">
+    <input type="checkbox" onclick="togglePassword()"> Show Password
+  </label>
+
   <button onclick="resetPassword()" style="padding:10px 20px;font-size:16px;">Set Password</button>
   <p id="status" style="margin-top:12px;color:crimson;"></p>
 
-  <!-- Load supabase.js first -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-  <!-- Then run your code -->
   <script>
     const SUPABASE_URL = "https://sbdagijwiamcuefrovri.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZGFnaWp3aWFtY3VlZnJvdnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwNzkxNjIsImV4cCI6MjA2MTY1NTE2Mn0.dNm3mcwbHbDXqotTHnDSZQRu1LTKfZD1LEvxtm4qwps";
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     const urlParams = new URLSearchParams(window.location.hash.slice(1));
     const access_token = urlParams.get("access_token");
+
+    function togglePassword() {
+      const passwordInput = document.getElementById("new-password");
+      passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    }
 
     function validatePassword(password) {
       const length = /.{8,}/;
