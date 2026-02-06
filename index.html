@@ -1,76 +1,196 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Reset Your Password</title>
+  <title>Reset Password - STING</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      max-width: 400px;
+      width: 100%;
+    }
+    h1 {
+      margin: 0 0 10px 0;
+      color: #1a1a2e;
+      font-size: 24px;
+    }
+    p {
+      color: #666;
+      margin: 0 0 30px 0;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #4a90d9;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #4a90d9;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #3a7bc8;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .error {
+      background: #fee;
+      color: #c00;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .success {
+      background: #efe;
+      color: #060;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .hidden { display: none; }
+  </style>
 </head>
-<body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
-  <h2>Reset Your Password</h2>
+<body>
+  <div class="container">
+    <h1>Reset Your Password</h1>
+    <p>Enter your new password below.</p>
 
-  <!-- Password input -->
-  <input id="new-password" type="password" placeholder="New Password"
-         style="padding:10px;font-size:16px;width:250px;margin-bottom:8px;">
+    <div id="error" class="error"></div>
+    <div id="success" class="success"></div>
 
-  <!-- Toggle visibility checkbox -->
-  <div style="margin-bottom:12px;">
-    <input type="checkbox" id="show-password" onchange="togglePassword()">
-    <label for="show-password">Show Password</label>
+    <form id="resetForm">
+      <div class="form-group">
+        <label for="password">New Password</label>
+        <input type="password" id="password" placeholder="Enter new password" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" placeholder="Confirm new password" required minlength="6">
+      </div>
+      <button type="submit" id="submitBtn">Reset Password</button>
+    </form>
   </div>
 
-  <!-- Submit button -->
-  <button onclick="resetPassword()" style="padding:10px 20px;font-size:16px;">Set Password</button>
-  <p id="status" style="margin-top:12px;color:crimson;"></p>
-
-  <!-- Load Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-  <!-- App logic -->
   <script>
-    const SUPABASE_URL = "https://sbdagijwiamcuefrovri.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZGFnaWp3aWFtY3VlZnJvdnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwNzkxNjIsImV4cCI6MjA2MTY1NTE2Mn0.dNm3mcwbHbDXqotTHnDSZQRu1LTKfZD1LEvxtm4qwps";
+    const SUPABASE_URL = 'https://zzghszcdupkjperbbjsq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6Z2hzemNkdXBranBlcmJianNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg1MzUwMTcsImV4cCI6MjA1NDExMTAxN30.kFVCHGU_HvBLmqmyL4wHPXjo2UNRlmRuP_nptR7v7ec';
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Extract access token from URL hash
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
 
-    const urlParams = new URLSearchParams(window.location.hash.slice(1));
-    const access_token = urlParams.get("access_token");
+    const errorEl = document.getElementById('error');
+    const successEl = document.getElementById('success');
+    const form = document.getElementById('resetForm');
+    const submitBtn = document.getElementById('submitBtn');
 
-    function togglePassword() {
-      const passwordField = document.getElementById("new-password");
-      passwordField.type = passwordField.type === "password" ? "text" : "password";
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
     }
 
-    function validatePassword(password) {
-      return (
-        /.{8,}/.test(password) &&
-        /[A-Z]/.test(password) &&
-        /[a-z]/.test(password) &&
-        /[0-9]/.test(password) &&
-        /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
-      );
+    function showSuccess(msg) {
+      successEl.textContent = msg;
+      successEl.style.display = 'block';
+      errorEl.style.display = 'none';
+      form.style.display = 'none';
     }
 
-    async function resetPassword() {
-      const password = document.getElementById("new-password").value;
-      const status = document.getElementById("status");
+    // Check if we have a token
+    if (!accessToken) {
+      showError('Invalid or expired reset link. Please request a new password reset.');
+      form.style.display = 'none';
+    }
 
-      if (!access_token) {
-        status.textContent = "Missing access token.";
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (password !== confirmPassword) {
+        showError('Passwords do not match.');
         return;
       }
 
-      if (!validatePassword(password)) {
-        status.textContent = "Password must be at least 8 characters and include upper/lowercase, number, and special character.";
+      if (password.length < 6) {
+        showError('Password must be at least 6 characters.');
         return;
       }
 
-      const { error } = await supabaseClient.auth.updateUser({ password }, { accessToken: access_token });
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Updating...';
 
-      if (error) {
-        status.textContent = "Error: " + error.message;
-      } else {
-        status.style.color = "green";
-        status.textContent = "Password updated successfully!";
+      try {
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: JSON.stringify({ password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showSuccess('Password updated successfully! You can now log in with your new password.');
+          setTimeout(() => {
+            window.location.href = 'https://mantum.tech';
+          }, 3000);
+        } else {
+          showError(data.error_description || data.msg || 'Failed to update password. The link may have expired.');
+        }
+      } catch (err) {
+        showError('Network error. Please try again.');
       }
-    }
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Reset Password';
+    });
   </script>
 </body>
 </html>
